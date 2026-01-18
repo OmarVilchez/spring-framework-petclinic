@@ -19,6 +19,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+        <jetty.http.port>9090</jetty.http.port>
 
         <!-- SonarQube configuration -->
         <sonar.organization>spring-petclinic</sonar.organization>
@@ -463,7 +464,12 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>${jetty-maven-plugin.version}</version>
+                <version>11.0.18</version>
+                <configuration>
+                    <httpConnector>
+                        <port>${jetty.http.port}</port>
+                    </httpConnector>
+                </configuration>
             </plugin>
 
             <plugin>
