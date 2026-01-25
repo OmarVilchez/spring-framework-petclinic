@@ -46,21 +46,17 @@ pipeline {
 
     stage('Sonar') {
       steps {
-        withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+        withSonarQubeEnv('sonar') {
           sh """
-            mvn -B -ntp sonar:sonar \
-              -Dsonar.host.url=http://138.68.0.100:9000 \
-              -Dsonar.login=${SONAR_TOKEN} \
+            mvn -B -ntp verify sonar:sonar \
               -Dsonar.projectKey=petclinic-monolith \
-              -Dsonar.projectName=Spring PetClinic Monolith \
-              -Dsonar.projectVersion=1.0 \
-              -Dsonar.sources=src/main \
-              -Dsonar.tests=src/test \
-              -Dsonar.java.binaries=target/classes
+              -Dsonar.projectName='Spring PetClinic Monolith' \
+              -Dsonar.projectVersion=1.0
           """
         }
       }
     }
+
 
 
     // Opcional recomendado: rompe el pipeline si falla el Quality Gate
