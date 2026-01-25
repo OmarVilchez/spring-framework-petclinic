@@ -48,7 +48,8 @@ pipeline {
       steps {
         withSonarQubeEnv('sonar') {
           sh """
-            mvn -B -ntp verify sonar:sonar \
+            mvn -B -ntp verify \
+              org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
               -Dsonar.projectKey=petclinic-monolith \
               -Dsonar.projectName='Spring PetClinic Monolith' \
               -Dsonar.projectVersion=1.0
@@ -56,6 +57,7 @@ pipeline {
         }
       }
     }
+
 
 
 
