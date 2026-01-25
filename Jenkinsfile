@@ -58,9 +58,6 @@ pipeline {
       }
     }
 
-
-
-
     // Opcional recomendado: rompe el pipeline si falla el Quality Gate
     stage('Quality Gate') {
       steps {
@@ -69,5 +66,30 @@ pipeline {
         }
       }
     }
+
+    stage('Publish Artifacts') {
+      steps {
+        script {
+          def server = Artifactory.server('artifactory')
+          def rtMaven = Artifactory.newMavenBuild()
+
+          rtMaven.deployer(
+            server: server,
+            releaseRepo: 'spring-petclinic-rest-release',
+            snapshotRepo: 'spring-petclinic-rest-snapshot'
+          )
+
+          def buildInfo = rtMaven.run(
+            pom: 'pom.xml',
+            goals: 'clean install -B -ntp -DskipTests'
+          )
+
+          server.publishBuildInfo(buildInfo)
+        }
+      }
+    }
+
+
+
   }
 }
