@@ -46,19 +46,22 @@ pipeline {
 
     stage('Sonar') {
       steps {
-        // Requiere: SonarQube configurado en Jenkins (Nombre de instalación) + token en credentials
-        // Ajusta estos 2 nombres a lo que tengas en Jenkins:
-        withSonarQubeEnv('SonarQube') {
-          withCredentials([string(credentialsId: 'sonarqube', variable: 'squ_8909dd2b9d68aada09d4ae14176fdc9799dc2caf')]) {
-            sh '''
-              mvn -B sonar:sonar \
-                -Dsonar.login=$SONAR_TOKEN \
-                -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-            '''
-          }
+        withCredentials([string(credentialsId: 'sonar-token', variable: 'squ_8909dd2b9d68aada09d4ae14176fdc9799dc2caf')]) {
+          sh """
+            mvn -B -ntp sonar:sonar \
+              -Dsonar.host.url=http://138.68.0.100:9000 \
+              -Dsonar.login=${SONAR_TOKEN} \
+              -Dsonar.projectKey=petclinic-monolith \
+              -Dsonar.projectName=Spring PetClinic Monolith \
+              -Dsonar.projectVersion=1.0 \
+              -Dsonar.sources=src/main \
+              -Dsonar.tests=src/test \
+              -Dsonar.java.binaries=target/classes
+          """
         }
       }
     }
+
 
     // Opcional recomendado: rompe el pipeline si falla el Quality Gate
     stage('Quality Gate') {
