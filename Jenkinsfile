@@ -46,7 +46,7 @@ pipeline {
 
     stage('Sonar') {
       steps {
-        withCredentials([string(credentialsId: 'sonar-token', variable: 'squ_8909dd2b9d68aada09d4ae14176fdc9799dc2caf')]) {
+        withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
           sh """
             mvn -B -ntp sonar:sonar \
               -Dsonar.host.url=http://138.68.0.100:9000 \
