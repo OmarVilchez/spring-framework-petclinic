@@ -49,7 +49,7 @@ pipeline {
         // Requiere: SonarQube configurado en Jenkins (Nombre de instalación) + token en credentials
         // Ajusta estos 2 nombres a lo que tengas en Jenkins:
         withSonarQubeEnv('SonarQube') {
-          withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+          withCredentials([string(credentialsId: 'jenkins', variable: 'squ_8909dd2b9d68aada09d4ae14176fdc9799dc2caf')]) {
             sh '''
               mvn -B sonar:sonar \
                 -Dsonar.login=$SONAR_TOKEN \
