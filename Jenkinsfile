@@ -67,26 +67,72 @@ pipeline {
       }
     }
 
-    stage('Publish Artifacts') {
+    stage('Publish Artifacts (Artifactory - Maven Layout)') {
       steps {
         script {
-          def server = Artifactory.server('artifactory')
+          def server   = Artifactory.server('artifactory')
           def buildInfo = Artifactory.newBuildInfo()
 
-          def uploadSpec = """{
+          // Lee coordenadas Maven desde tu pom.xml
+          def pom = readMavenPom file: 'pom.xml'
+          def groupPath = pom.groupId.replace('.', '/')
+          def artifact  = pom.artifactId
+          def version   = pom.version
+          def repo      = 'spring-petclinic-rest-release'
+
+          // Tu build genera WAR y tu finalName es "petclinic"
+          def warSource = "target/petclinic.war"
+
+          // Lo subimos con nombre Maven estándar: artifactId-version.war
+          def uploadSpec = """
+          {
             "files": [
               {
-                "pattern": "target/*.jar",
-                "target": "spring-petclinic-rest-release/petclinic/${BUILD_NUMBER}/"
+                "pattern": "${warSource}",
+                "target": "${repo}/${groupPath}/${artifact}/${version}/${artifact}-${version}.war",
+                "flat": "true"
+              },
+              {
+                "pattern": "pom.xml",
+                "target": "${repo}/${groupPath}/${artifact}/${version}/${artifact}-${version}.pom",
+                "flat": "true"
               }
             ]
-          }"""
+          }
+          """
 
-          server.upload(uploadSpec, buildInfo)
+          server.upload(spec: uploadSpec, buildInfo: buildInfo)
           server.publishBuildInfo(buildInfo)
         }
       }
     }
+
+
+//     stage('Publish Artifacts') {
+//       steps {
+//         script {
+//           def server = Artifactory.server('artifactory')
+//           def buildInfo = Artifactory.newBuildInfo()
+//
+//           def uploadSpec = """{
+//             "files": [
+//               {
+//                 "pattern": "target/*.war",
+//                 "target": "spring-petclinic-rest-release/petclinic/${BUILD_NUMBER}/"
+//               }
+//             ]
+//           }"""
+//
+//           server.upload(uploadSpec, buildInfo)
+//           server.publishBuildInfo(buildInfo)
+//         }
+//       }
+//     }
+
+  }
+}
+
+
 
 //     stage("Publish Artifacts (Artifactory - File Spec)") {
 //       steps {
@@ -119,11 +165,3 @@ pipeline {
 //         }
 //       }
 //     }
-
-
-
-
-
-
-  }
-}
