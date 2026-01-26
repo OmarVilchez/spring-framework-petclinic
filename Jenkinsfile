@@ -81,7 +81,7 @@ pipeline {
           def repo      = 'spring-petclinic-rest-release'
 
           // Tu build genera WAR y tu finalName es "petclinic"
-          def warSource = "target/petclinic.war"
+          def warSource = "target/*.war"
 
           // Lo subimos con nombre Maven estándar: artifactId-version.war
           def uploadSpec = """
