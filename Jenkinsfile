@@ -67,37 +67,58 @@ pipeline {
       }
     }
 
-    stage("Publish Artifacts (Artifactory - File Spec)") {
+    stage('Publish Artifacts') {
       steps {
         script {
           def server = Artifactory.server('artifactory')
-          def targetRepo = 'spring-petclinic-rest-release'   // tu repo Maven local
+          def buildInfo = Artifactory.newBuildInfo()
 
-          def pom = readMavenPom file: 'pom.xml'
-          def groupIdPath = pom.groupId.replace('.', '/')
-
-          // PetClinic es WAR normalmente. Por eso sube *.war y también *.jar por si acaso.
-          def uploadSpec = """
-          {
+          def uploadSpec = """{
             "files": [
               {
-                "pattern": "target/${pom.artifactId}-${pom.version}.war",
-                "target": "${targetRepo}/${groupIdPath}/${pom.artifactId}/${pom.version}/",
-                "flat": "true"
-              },
-              {
-                "pattern": "target/${pom.artifactId}-${pom.version}.jar",
-                "target": "${targetRepo}/${groupIdPath}/${pom.artifactId}/${pom.version}/",
-                "flat": "true"
+                "pattern": "target/*.jar",
+                "target": "spring-petclinic-rest-release/petclinic/${BUILD_NUMBER}/"
               }
             ]
-          }
-          """
+          }"""
 
-          server.upload spec: uploadSpec
+          server.upload(uploadSpec, buildInfo)
+          server.publishBuildInfo(buildInfo)
         }
       }
     }
+
+//     stage("Publish Artifacts (Artifactory - File Spec)") {
+//       steps {
+//         script {
+//           def server = Artifactory.server('artifactory')
+//           def targetRepo = 'spring-petclinic-rest-release'   // tu repo Maven local
+//
+//           def pom = readMavenPom file: 'pom.xml'
+//           def groupIdPath = pom.groupId.replace('.', '/')
+//
+//           // PetClinic es WAR normalmente. Por eso sube *.war y también *.jar por si acaso.
+//           def uploadSpec = """
+//           {
+//             "files": [
+//               {
+//                 "pattern": "target/${pom.artifactId}-${pom.version}.war",
+//                 "target": "${targetRepo}/${groupIdPath}/${pom.artifactId}/${pom.version}/",
+//                 "flat": "true"
+//               },
+//               {
+//                 "pattern": "target/${pom.artifactId}-${pom.version}.jar",
+//                 "target": "${targetRepo}/${groupIdPath}/${pom.artifactId}/${pom.version}/",
+//                 "flat": "true"
+//               }
+//             ]
+//           }
+//           """
+//
+//           server.upload spec: uploadSpec
+//         }
+//       }
+//     }
 
 
 
