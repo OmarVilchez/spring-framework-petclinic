@@ -71,22 +71,26 @@ pipeline {
       steps {
         script {
           def server = Artifactory.server('artifactory')
-          def buildInfo = Artifactory.newBuildInfo()
 
-          def uploadSpec = """{
-            "files": [
-              {
-                "pattern": "target/*.jar",
-                "target": "spring-petclinic-rest-release/petclinic/${BUILD_NUMBER}/"
-              }
-            ]
-          }"""
+          def rtMaven = Artifactory.newMavenBuild()
+          rtMaven.tool = 'Maven3'
 
-          server.upload(uploadSpec, buildInfo)
+          rtMaven.deployer(
+            server: server,
+            releaseRepo: 'spring-petclinic-rest-release',
+            snapshotRepo: 'spring-petclinic-rest-snapshot'
+          )
+
+          def buildInfo = rtMaven.run(
+            pom: 'pom.xml',
+            goals: 'clean install -B -ntp -DskipTests'
+          )
+
           server.publishBuildInfo(buildInfo)
         }
       }
     }
+
 
 
 
