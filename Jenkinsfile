@@ -67,29 +67,38 @@ pipeline {
       }
     }
 
-    stage('Publish Artifacts') {
+    stage("Publish Artifacts (Artifactory - File Spec)") {
       steps {
         script {
           def server = Artifactory.server('artifactory')
+          def targetRepo = 'spring-petclinic-rest-release'   // tu repo Maven local
 
-          def rtMaven = Artifactory.newMavenBuild()
-          rtMaven.tool = 'Maven3'
+          def pom = readMavenPom file: 'pom.xml'
+          def groupIdPath = pom.groupId.replace('.', '/')
 
-          rtMaven.deployer(
-            server: server,
-            releaseRepo: 'spring-petclinic-rest-release',
-            snapshotRepo: 'spring-petclinic-rest-snapshot'
-          )
+          // PetClinic es WAR normalmente. Por eso sube *.war y también *.jar por si acaso.
+          def uploadSpec = """
+          {
+            "files": [
+              {
+                "pattern": "target/${pom.artifactId}-${pom.version}.war",
+                "target": "${targetRepo}/${groupIdPath}/${pom.artifactId}/${pom.version}/",
+                "flat": "true"
+              },
+              {
+                "pattern": "target/${pom.artifactId}-${pom.version}.jar",
+                "target": "${targetRepo}/${groupIdPath}/${pom.artifactId}/${pom.version}/",
+                "flat": "true"
+              }
+            ]
+          }
+          """
 
-          def buildInfo = rtMaven.run(
-            pom: 'pom.xml',
-            goals: 'clean install -B -ntp -DskipTests'
-          )
-
-          server.publishBuildInfo(buildInfo)
+          server.upload spec: uploadSpec
         }
       }
     }
+
 
 
 
