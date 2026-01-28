@@ -50,7 +50,15 @@ El pipeline fue implementado en Jenkins mediante un `Jenkinsfile` y contiene los
 
 ---
 
-### Jenkins – Ejecución del Pipeline
+### Build
+![Build](images/build.png)
+
+---
+
+### Testing(Junit + Jacoco)
+
+![Test Junit + Jacoco](images/test-junit-jacoco.png)
+
 ![Jenkins Pipeline](images/test-jenkins.png)
 
 ---
@@ -69,6 +77,3 @@ El pipeline fue implementado en Jenkins mediante un `Jenkinsfile` y contiene los
 ![JFrog Artifactory](images/jfrog-artifactory.png)
 
 ---
-
-
-
